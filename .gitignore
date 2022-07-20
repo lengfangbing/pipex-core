@@ -1,0 +1,7 @@
+*.xml
+.idea
+node_modules
+dist
+build
+lib
+**/temp/**
