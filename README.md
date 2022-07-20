@@ -2,7 +2,7 @@
 
 [![tag](https://img.shields.io/github/tag/lengfangbing/pipex-core.svg)](https://github.com/lengfangbing/pipex-core)
 [![license](https://img.shields.io/github/license/lengfangbing/pipex-core.svg)](https://github.com/lengfangbing/pipex-core)
-[![npm version](https://img.shields.io/npm/v/@pipex/core.svg?style=flat)](https://www.npmjs.com/package/@bell-crow/pipex-core)
+[![npm version](https://img.shields.io/npm/v/@pipex/core.svg?style=flat)](https://www.npmjs.com/package/@pipex/core)
 [![Build Status](https://app.travis-ci.com/lengfangbing/pipex-core.svg?branch=main)](https://app.travis-ci.com/lengfangbing/pipex-core)
 [![Coverage Status](https://coveralls.io/repos/github/lengfangbing/pipex-core/badge.svg?branch=main)](https://coveralls.io/github/lengfangbing/pipex-core?branch=main)
 
