@@ -14,16 +14,16 @@
   "keywords": [
     "process",
     "pipeline",
-    "crow",
-    "bell"
+    "pipex",
+    "core"
   ],
   "author": "lengfangbing",
   "license": "ISC",
   "repository": {
-    "url": "https://github.com/lengfangbing/pipe-core"
+    "url": "https://github.com/lengfangbing/pipex-core"
   },
   "bugs": {
-    "url": "https://github.com/lengfangbing/pipe-core/issues"
+    "url": "https://github.com/lengfangbing/pipex-core/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.16.12",
@@ -34,6 +34,7 @@
     "@typescript-eslint/parser": "^5.10.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-latest": "^6.24.1",
+    "coveralls": "^3.1.1",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
