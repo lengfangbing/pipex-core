@@ -11,8 +11,6 @@ import {
   PipeConfigFunction
 } from './types';
 
-export * from './types';
-
 // 创建传入的start方法
 function createPipeCoreConfig<Value extends object, CustomStart extends CustomStartConfig<Value>> (
   valueFactory: PipeValueFactory<Value>,
