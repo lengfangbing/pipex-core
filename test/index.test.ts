@@ -38,7 +38,7 @@ const sleep = async (time = 3000) => new Promise<void>(resolve => {
 });
 
 test('test async process', async () => {
-  const valueCore = createPipeCore(_value, customStartFunction);
+  const valueCore = createPipeCore({ ..._value }, customStartFunction);
   let a = 0;
   await valueCore
     .getName(async name => {
@@ -68,7 +68,7 @@ test('test async process', async () => {
 });
 
 test('test setValue process', async () => {
-  const valueCore = createPipeCore(_value, customStartFunction);
+  const valueCore = createPipeCore({ ..._value }, customStartFunction);
   let a = 0;
   await valueCore
     .getName(async name => {
@@ -123,7 +123,7 @@ test('test setValue process', async () => {
 });
 
 test('test empty value core', async () => {
-  const valueCore = createPipeCore(_value);
+  const valueCore = createPipeCore({ ..._value });
 
   await valueCore
     .pipeEnd()
@@ -142,7 +142,7 @@ test('test empty value core', async () => {
 });
 
 test('test use piece pipe core process', async () => {
-  const valueCore = createPipeCore(_value, customStartFunction);
+  const valueCore = createPipeCore({ ..._value }, customStartFunction);
   // 计数器
   let count = 0;
   await valueCore
@@ -208,8 +208,100 @@ test('test use piece pipe core process', async () => {
     });
 });
 
+test('test instance case', async () => {
+  const valueCore = createPipeCore({ ..._value }, customStartFunction);// 计数器
+  let count = 0;
+  async function instanceCase () {
+    await valueCore
+      .instance()
+      .getName(() => {
+        expect(count).toBe(4);
+        count++;
+        return '123';
+      })
+      .pipe<string>(name => {
+        expect(count).toBe(5);
+        count++;
+        expect(name).toBe('123');
+      })
+      .getValue((_, piecePipe) => {
+        expect(count).toBe(6);
+        count++;
+        piecePipe
+          .getName(name => {
+            expect(count).toBe(7);
+            count++;
+            expect(name).toBe('new pipe-core');
+          });
+      })
+      .pipeEnd();
+  }
+  await valueCore
+    .getName(name => {
+      count++;
+      expect(name).toBe('pipe-core');
+      return name;
+    })
+    .pipe<string>((name, piecePipe, set) => {
+      expect(count).toBe(1);
+      count++;
+      set({ name: 'new pipe-core' });
+      piecePipe
+        .getName(() => {
+          expect(count).toBe(2);
+          count++;
+        });
+    })
+    .getValue(async (_, piecePipe) => {
+      expect(count).toBe(3);
+      count++;
+      await instanceCase();
+      piecePipe
+        .getName(name => {
+          expect(count).toBe(8);
+          count++;
+          expect(name).toBe('new pipe-core');
+          return name;
+        })
+        .pipe<string>((name, piecePipe) => {
+          expect(count).toBe(9);
+          count++;
+          piecePipe
+            .getName(_name => {
+              expect(count).toBe(10);
+              count++;
+              return _name;
+            })
+            .pipe<string>((_name, _, set) => {
+              expect(count).toBe(11);
+              count++;
+              set({ name: 'pipe-core' });
+            });
+        });
+    })
+    .getName(name => {
+      expect(count).toBe(12);
+      count++;
+      expect(name).toBe('pipe-core');
+    })
+    .pipeEnd()
+    .then(value => {
+      expect(count).toBe(13);
+      const { location, ...rest } = value;
+      expect(rest).toEqual({
+        name: 'pipe-core',
+        age: 1,
+        nick: {
+          pipe: 1,
+          core: 2
+        },
+        city: [1, 2, 3]
+      });
+    });
+});
+
 test('test createPipeCore case', async () => {
-  const valueCore = createPipeCore(_value, customStartFunction);
+  const valueCore = createPipeCore({ ..._value }, customStartFunction);
 
   await valueCore
     .getDoubleAge(doubleAge => {

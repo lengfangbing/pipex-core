@@ -8,7 +8,7 @@ import {
   CustomFunction,
   Action,
   PipeCoreConfig,
-  PipeConfigFunction
+  PipeConfigFunction, PipeCoreInstance
 } from './types';
 
 // 创建传入的start方法
@@ -124,10 +124,24 @@ function createPipeEnd<Value extends object> (
   };
 }
 
+function createPipeCoreInstance<Value extends object, CustomStart extends CustomStartConfig<Value>> (
+  value: PipeValueFactory<Value>,
+  config = {} as CustomStart
+): PipeCoreInstance<Value, CustomStart> {
+  return {
+    instance () {
+      return createPipeCoreConfig(PipeValueFactory.createPipeValue(value.getValue()), { config });
+    }
+  };
+}
+
 export function createPipeCore<Value extends object, CustomStart extends CustomStartConfig<Value>> (
   value: Value,
   config = {} as CustomStart
 ): PipeCore<Value, CustomStart> {
   const _value = PipeValueFactory.createPipeValue(value);
-  return createPipeCoreConfig(_value, { config });
+  return {
+    ...createPipeCoreInstance(_value, config),
+    ...createPipeCoreConfig(_value, { config })
+  };
 }

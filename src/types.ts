@@ -66,4 +66,8 @@ export type OtherPipeCoreConfig<Value, Config extends CustomStartConfig<Value>> 
 
 export type PiecePipeCore<Value, Config extends CustomStartConfig<Value>> = OtherPipeCoreConfig<Value, Config>;
 
-export type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreConfig<Value, Config>;
+export type PipeCoreInstance<Value, Config extends CustomStartConfig<Value>> = {
+  instance(): PipeCoreConfig<Value, Config>;
+};
+
+export type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreInstance<Value, Config> & PipeCoreConfig<Value, Config>;
