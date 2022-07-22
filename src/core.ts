@@ -125,12 +125,20 @@ function createPipeEnd<Value extends object> (
 }
 
 function createPipeCoreInstance<Value extends object, CustomStart extends CustomStartConfig<Value>> (
-  value: PipeValueFactory<Value>,
-  config = {} as CustomStart
+  valueFactory: PipeValueFactory<Value>,
+  config = {} as CustomStart,
+  value: Value
 ): PipeCoreInstance<Value, CustomStart> {
   return {
-    instance () {
-      return createPipeCoreConfig(PipeValueFactory.createPipeValue(value.getValue()), { config });
+    instance (createOneFreshValue) {
+      const newValueFactory = createOneFreshValue
+        ? PipeValueFactory.createPipeValue(value)
+        : PipeValueFactory.createPipeValue(valueFactory.getValue());
+      // 如果不需要重新创建一组value，那么要共用一套value，就把set方法指向上一个valueFactory
+      if (!createOneFreshValue) {
+        newValueFactory.setValue = newValueFactory.setValue.bind(valueFactory);
+      }
+      return createPipeCoreConfig(newValueFactory, { config });
     }
   };
 }
@@ -141,7 +149,7 @@ export function createPipeCore<Value extends object, CustomStart extends CustomS
 ): PipeCore<Value, CustomStart> {
   const _value = PipeValueFactory.createPipeValue(value);
   return {
-    ...createPipeCoreInstance(_value, config),
+    ...createPipeCoreInstance(_value, config, value),
     ...createPipeCoreConfig(_value, { config })
   };
 }

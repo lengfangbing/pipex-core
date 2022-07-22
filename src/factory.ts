@@ -31,7 +31,7 @@ export class PipeValueFactory<Value extends Record<string, any>> {
     this.actionList = [];
   }
 
-  private findActionValueForEachList (
+  findActionValueForEachList (
     actionValue: Action['value'],
     list: Array<Action>
   ): Action | void {

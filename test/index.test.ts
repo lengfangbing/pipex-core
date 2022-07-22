@@ -208,10 +208,10 @@ test('test use piece pipe core process', async () => {
     });
 });
 
-test('test instance case', async () => {
+test('test instance process process', async () => {
   const valueCore = createPipeCore({ ..._value }, customStartFunction);// 计数器
   let count = 0;
-  async function instanceCase () {
+  async function instanceCaseWithoutNewValue () {
     await valueCore
       .instance()
       .getName(() => {
@@ -224,14 +224,40 @@ test('test instance case', async () => {
         count++;
         expect(name).toBe('123');
       })
-      .getValue((_, piecePipe) => {
+      .getValue(async (_, piecePipe) => {
         expect(count).toBe(6);
+        count++;
+        await instanceCaseWithNewValue();
+        piecePipe
+          .getName(name => {
+            expect(count).toBe(11);
+            count++;
+            expect(name).toBe('new pipe-core');
+          });
+      })
+      .pipeEnd();
+  }
+  async function instanceCaseWithNewValue () {
+    await valueCore
+      .instance(true)
+      .getName(() => {
+        expect(count).toBe(7);
+        count++;
+        return '123';
+      })
+      .pipe<string>(name => {
+        expect(count).toBe(8);
+        count++;
+        expect(name).toBe('123');
+      })
+      .getValue((_, piecePipe) => {
+        expect(count).toBe(9);
         count++;
         piecePipe
           .getName(name => {
-            expect(count).toBe(7);
+            expect(count).toBe(10);
             count++;
-            expect(name).toBe('new pipe-core');
+            expect(name).toBe('pipe-core');
           });
       })
       .pipeEnd();
@@ -255,38 +281,38 @@ test('test instance case', async () => {
     .getValue(async (_, piecePipe) => {
       expect(count).toBe(3);
       count++;
-      await instanceCase();
+      await instanceCaseWithoutNewValue();
       piecePipe
         .getName(name => {
-          expect(count).toBe(8);
+          expect(count).toBe(12);
           count++;
           expect(name).toBe('new pipe-core');
           return name;
         })
         .pipe<string>((name, piecePipe) => {
-          expect(count).toBe(9);
+          expect(count).toBe(13);
           count++;
           piecePipe
             .getName(_name => {
-              expect(count).toBe(10);
+              expect(count).toBe(14);
               count++;
               return _name;
             })
             .pipe<string>((_name, _, set) => {
-              expect(count).toBe(11);
+              expect(count).toBe(15);
               count++;
               set({ name: 'pipe-core' });
             });
         });
     })
     .getName(name => {
-      expect(count).toBe(12);
+      expect(count).toBe(16);
       count++;
       expect(name).toBe('pipe-core');
     })
     .pipeEnd()
     .then(value => {
-      expect(count).toBe(13);
+      expect(count).toBe(17);
       const { location, ...rest } = value;
       expect(rest).toEqual({
         name: 'pipe-core',
@@ -372,4 +398,154 @@ test('test createPipeCore case', async () => {
         city: [3, 2, 1]
       });
     });
+});
+
+test('test use piecePipe and set', async () => {
+  const value = {
+    name: '@pipex/core',
+    loading: false
+  };
+  const customStart = {
+    getName (_value: typeof value) {
+      return `custom returned ${_value.name}`;
+    },
+    getLoading (_value: typeof value) {
+      return _value.loading;
+    },
+    getValue (_value: typeof value) {
+      return _value;
+    }
+  };
+  const pipeCore = createPipeCore(value, customStart);
+  await pipeCore
+    .getName((name, piecePipe) => {
+      // name === 'custom returned @pipex/core'
+      expect(name).toBe('custom returned @pipex/core');
+      piecePipe
+        .getLoading((loading, _, set) => {
+          // loading === false
+          expect(loading).toBe(false);
+          // update loading value to true
+          set({ loading: true });
+        });
+      return '123';
+    })
+    .pipe<string>((name, piecePipe) => {
+      // name === '123'
+      expect(name).toBe('123');
+      piecePipe
+        .getLoading((loading, _, set) => {
+          // loading === true
+          expect(loading).toBe(true);
+        });
+    })
+    .pipeEnd();
+});
+
+test('test use instance()', async () => {
+  const value = {
+    name: '@pipex/core',
+    loading: false
+  };
+  const customStart = {
+    getName (_value: typeof value) {
+      return `custom returned ${_value.name}`;
+    },
+    getLoading (_value: typeof value) {
+      return _value.loading;
+    },
+    getValue (_value: typeof value) {
+      return _value;
+    }
+  };
+  const pipeCore = createPipeCore(value, customStart);
+  const testInstance = async () => {
+    await pipeCore
+      .instance()
+      .getValue(async (_, __, set) => {
+        // update loading to true
+        set({ loading: true });
+        await testNewInstance();
+      })
+      .pipeEnd();
+  };
+  const testNewInstance = async () => {
+    await pipeCore
+      .instance(true)
+      .getValue((_, __, set) => {
+        // update name
+        set({ name: 'instance @pipex/core' });
+      })
+      .pipeEnd();
+  };
+  await pipeCore
+    .getName((name, piecePipe) => {
+      // name === 'custom returned @pipex/core'
+      piecePipe
+        .getLoading(async (loading, _piecePipe, set) => {
+          // loading === false
+          expect(loading).toBe(false);
+          // update loading value to true
+          await testInstance();
+          _piecePipe
+            .getName(_name => {
+              // name === 'custom returned @pipex/core'，instance(true) will create one independent PipeCore, not reference value to source PipeCore
+              expect(name).toBe('custom returned @pipex/core');
+            })
+            .getLoading(_loading => {
+              // loading === true
+              expect(_loading).toBe(true);
+              // called instance before _piecePipe, so loading is true
+            });
+        });
+    })
+    .pipeEnd();
+});
+
+test('test instance() correct1', async () => {
+  const value = {
+    name: '@pipex/core',
+    loading: false
+  };
+  const customStart = {
+    getName (_value: typeof value) {
+      return `custom returned ${_value.name}`;
+    },
+    getLoading (_value: typeof value) {
+      return _value.loading;
+    },
+    getValue (_value: typeof value) {
+      return _value;
+    }
+  };
+  const pipeCore = createPipeCore(value, customStart);
+  const newInstance = async () => {
+    await pipeCore
+      .instance(true)
+      .getValue(_value => {
+        expect(_value).toEqual({
+          name: '@pipex/core',
+          loading: false
+        });
+      })
+      .pipeEnd();
+  };
+  const instance = async () => {
+    await pipeCore
+      .instance()
+      .getValue(_value => {
+        expect(_value).toEqual({
+          name: 'change name @pipex/core',
+          loading: false
+        });
+      })
+      .pipeEnd();
+  };
+  await pipeCore
+    .getValue(async (val, _, set) => {
+      set({ name: 'change name @pipex/core' });
+      await instance();
+      await newInstance();
+    })
+    .pipeEnd();
 });
