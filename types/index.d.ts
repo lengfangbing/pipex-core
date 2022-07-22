@@ -26,8 +26,15 @@ declare type OtherCustomStartConfigFunctions<Value, Config extends CustomStartCo
 };
 declare type OtherPipeCoreConfig<Value, Config extends CustomStartConfig<Value>> = OtherCustomStartConfigFunctions<Value, Config>;
 declare type PiecePipeCore<Value, Config extends CustomStartConfig<Value>> = OtherPipeCoreConfig<Value, Config>;
-declare type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreConfig<Value, Config>;
+declare type PipeCoreInstance<Value, Config extends CustomStartConfig<Value>> = {
+    /**
+     * create one new pipeline to call
+     * @param {Boolean} [createOneFreshValue] - means need create one independent PipeCore, default is false
+     */
+    instance(createOneFreshValue?: boolean): PipeCoreConfig<Value, Config>;
+};
+declare type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreInstance<Value, Config> & PipeCoreConfig<Value, Config>;
 
 declare function createPipeCore<Value extends object, CustomStart extends CustomStartConfig<Value>>(value: Value, config?: CustomStart): PipeCore<Value, CustomStart>;
 
-export { Action, CustomFunction, CustomStartConfig, CustomStartConfigFunctions, OtherCustomStartConfigFunctions, OtherPipeConfigFunction, OtherPipeCoreConfig, OtherPipeFunction, PiecePipeCore, PipeConfigFunction, PipeCore, PipeCoreConfig, PipeEnd, PipeFunction, ReturnTypeAlias, createPipeCore };
+export { Action, CustomFunction, CustomStartConfig, CustomStartConfigFunctions, OtherCustomStartConfigFunctions, OtherPipeConfigFunction, OtherPipeCoreConfig, OtherPipeFunction, PiecePipeCore, PipeConfigFunction, PipeCore, PipeCoreConfig, PipeCoreInstance, PipeEnd, PipeFunction, ReturnTypeAlias, createPipeCore };
