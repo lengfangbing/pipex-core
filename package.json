@@ -1,6 +1,6 @@
 {
   "name": "@pipex/core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "process data like a pipeline",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",

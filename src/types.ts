@@ -1,5 +1,7 @@
 /* eslint-disable no-use-before-define */
 type Await<T> = T extends PromiseLike<infer U> ? U : T;
+type ExtendFunction = (...args: any) => any;
+
 // 方法返回值的简写方法
 export type ReturnTypeAlias<Function extends (...args: any) => any> = Await<ReturnType<Function>>;
 
@@ -23,20 +25,20 @@ export type PipeEnd<Value> = {
 };
 
 // pipe config
-export type PipeConfigFunction<Value, Config extends CustomStartConfig<Value>> = {
-  pipe: PipeFunction<Value, Config>;
+export type PipeConfigFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = {
+  pipe: PipeFunction<Value, Config, ParamValue>;
 };
 
 // 运行中的pipe方法
-export type PipeFunction<Value, Config extends CustomStartConfig<Value>> = <ParamValue = any>(
-  custom: CustomFunction<Value, Config, ParamValue>,
-) => PipeConfigFunction<Value, Config> & PipeEnd<Value> & CustomStartConfigFunctions<Value, Config>;
+export type PipeFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = <C extends CustomFunction<Value, Config, ParamValue>>(
+  custom: C,
+) => PipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & PipeEnd<Value> & CustomStartConfigFunctions<Value, Config>;
 
 // 运行中的Config方法的类型
 export type CustomStartConfigFunctions<Value, Config extends CustomStartConfig<Value>> = {
-  [key in keyof Config]: (
-    custom: CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>,
-  ) => PipeConfigFunction<Value, Config> & CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
+  [key in keyof Config]: <C extends CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>>(
+    custom: C,
+  ) => PipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
 };
 
 // 主流程的PipeCore调用方法
@@ -44,20 +46,20 @@ export type PipeCoreConfig<Value, Config extends CustomStartConfig<Value>> =
   CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
 
 // pipe config
-export type OtherPipeConfigFunction<Value, Config extends CustomStartConfig<Value>> = {
-  pipe: OtherPipeFunction<Value, Config>;
+export type OtherPipeConfigFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = {
+  pipe: OtherPipeFunction<Value, Config, ParamValue>;
 };
 
 // 子流程的运行中的pipe方法
-export type OtherPipeFunction<Value, Config extends CustomStartConfig<Value>> = <ParamValue = any>(
-  custom: CustomFunction<Value, Config, ParamValue>,
-) => OtherPipeConfigFunction<Value, Config> & OtherCustomStartConfigFunctions<Value, Config>;
+export type OtherPipeFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = <C extends CustomFunction<Value, Config, ParamValue>>(
+  custom: C,
+) => OtherPipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & OtherCustomStartConfigFunctions<Value, Config>;
 
 // 子流程的运行中的Config方法的类型
 export type OtherCustomStartConfigFunctions<Value, Config extends CustomStartConfig<Value>> = {
-  [key in keyof Config]: (
-    custom: CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>,
-  ) => OtherPipeConfigFunction<Value, Config> & OtherCustomStartConfigFunctions<Value, Config>;
+  [key in keyof Config]: <C extends CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>>(
+    custom: C,
+  ) => OtherPipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & OtherCustomStartConfigFunctions<Value, Config>;
 };
 
 // 子流程的PipeCore调用方法

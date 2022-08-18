@@ -75,7 +75,7 @@ function createPipe<Value extends object, CustomStart extends CustomStartConfig<
     config: CustomStart;
     customFunctionInMap: (...args: any) => any;
   }
-): PipeConfigFunction<Value, CustomStart> {
+) {
   return {
     pipe (custom: CustomFunction<Value, CustomStart>) {
       const customFunction = async () => {

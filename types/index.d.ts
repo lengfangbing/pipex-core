@@ -9,20 +9,20 @@ declare type CustomFunction<Value, Config extends CustomStartConfig<Value>, Para
 declare type PipeEnd<Value> = {
     pipeEnd: () => Promise<Value>;
 };
-declare type PipeConfigFunction<Value, Config extends CustomStartConfig<Value>> = {
-    pipe: PipeFunction<Value, Config>;
+declare type PipeConfigFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = {
+    pipe: PipeFunction<Value, Config, ParamValue>;
 };
-declare type PipeFunction<Value, Config extends CustomStartConfig<Value>> = <ParamValue = any>(custom: CustomFunction<Value, Config, ParamValue>) => PipeConfigFunction<Value, Config> & PipeEnd<Value> & CustomStartConfigFunctions<Value, Config>;
+declare type PipeFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = <C extends CustomFunction<Value, Config, ParamValue>>(custom: C) => PipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & PipeEnd<Value> & CustomStartConfigFunctions<Value, Config>;
 declare type CustomStartConfigFunctions<Value, Config extends CustomStartConfig<Value>> = {
-    [key in keyof Config]: (custom: CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>) => PipeConfigFunction<Value, Config> & CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
+    [key in keyof Config]: <C extends CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>>(custom: C) => PipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
 };
 declare type PipeCoreConfig<Value, Config extends CustomStartConfig<Value>> = CustomStartConfigFunctions<Value, Config> & PipeEnd<Value>;
-declare type OtherPipeConfigFunction<Value, Config extends CustomStartConfig<Value>> = {
-    pipe: OtherPipeFunction<Value, Config>;
+declare type OtherPipeConfigFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = {
+    pipe: OtherPipeFunction<Value, Config, ParamValue>;
 };
-declare type OtherPipeFunction<Value, Config extends CustomStartConfig<Value>> = <ParamValue = any>(custom: CustomFunction<Value, Config, ParamValue>) => OtherPipeConfigFunction<Value, Config> & OtherCustomStartConfigFunctions<Value, Config>;
+declare type OtherPipeFunction<Value, Config extends CustomStartConfig<Value>, ParamValue> = <C extends CustomFunction<Value, Config, ParamValue>>(custom: C) => OtherPipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & OtherCustomStartConfigFunctions<Value, Config>;
 declare type OtherCustomStartConfigFunctions<Value, Config extends CustomStartConfig<Value>> = {
-    [key in keyof Config]: (custom: CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>) => OtherPipeConfigFunction<Value, Config> & OtherCustomStartConfigFunctions<Value, Config>;
+    [key in keyof Config]: <C extends CustomFunction<Value, Config, ReturnTypeAlias<Config[key]>>>(custom: C) => OtherPipeConfigFunction<Value, Config, ReturnTypeAlias<C>> & OtherCustomStartConfigFunctions<Value, Config>;
 };
 declare type OtherPipeCoreConfig<Value, Config extends CustomStartConfig<Value>> = OtherCustomStartConfigFunctions<Value, Config>;
 declare type PiecePipeCore<Value, Config extends CustomStartConfig<Value>> = OtherPipeCoreConfig<Value, Config>;

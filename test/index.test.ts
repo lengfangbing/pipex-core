@@ -46,7 +46,7 @@ test('test async process', async () => {
       await sleep();
       return `changed ${name}`;
     })
-    .pipe<string>(name => {
+    .pipe(name => {
       expect(a).toBe(1);
       a++;
       expect(name).toBe('changed pipe-core');
@@ -76,7 +76,7 @@ test('test setValue process', async () => {
       await sleep();
       return `changed ${name}`;
     })
-    .pipe<string>(name => {
+    .pipe(name => {
       expect(a).toBe(1);
       a++;
       expect(name).toBe('changed pipe-core');
@@ -151,7 +151,7 @@ test('test use piece pipe core process', async () => {
       expect(name).toBe('pipe-core');
       return name;
     })
-    .pipe<string>((name, piecePipe, set) => {
+    .pipe((name, piecePipe, set) => {
       expect(count).toBe(1);
       count++;
       set({ name: 'new pipe-core' });
@@ -171,7 +171,7 @@ test('test use piece pipe core process', async () => {
           expect(name).toBe('new pipe-core');
           return name;
         })
-        .pipe<string>((name, piecePipe) => {
+        .pipe((name, piecePipe) => {
           expect(count).toBe(5);
           count++;
           piecePipe
@@ -180,7 +180,7 @@ test('test use piece pipe core process', async () => {
               count++;
               return _name;
             })
-            .pipe<string>((_name, _, set) => {
+            .pipe((_name, _, set) => {
               expect(count).toBe(7);
               count++;
               set({ name: 'pipe-core' });
@@ -216,7 +216,7 @@ test('test createPipeCore case', async () => {
       expect(doubleAge).toBe(2);
       return doubleAge / 2;
     })
-    .pipe<number>(divideAge => {
+    .pipe(divideAge => {
       expect(divideAge).toBe(1);
     })
     .getDoubleAge(doubleAge => {
@@ -229,27 +229,27 @@ test('test createPipeCore case', async () => {
       expect(name).toBe('pipe-core');
       return 'changed-pipe-core';
     })
-    .pipe<string>(changedName => {
+    .pipe(changedName => {
       expect(changedName).toEqual('changed-pipe-core');
     })
     .getCity(city => {
       expect(city).toEqual([1, 2, 3]);
       return city.reverse();
     })
-    .pipe<Array<number>>((changedCity, _, update) => {
+    .pipe((changedCity, _, update) => {
       expect(changedCity).toEqual([3, 2, 1]);
       update({ city: [3, 2, 1] });
     })
     .getCity(city => {
       return city;
     })
-    .pipe<Array<number>>(city => {
+    .pipe(city => {
       expect(city).toEqual([3, 2, 1]);
     })
     .getLocation(location => {
       expect(location).toBe('Asia');
     })
-    .pipe<unknown>((val, _, update) => {
+    .pipe((val, _, update) => {
       expect(val).toBeUndefined();
       update({ location: () => 'Europe' });
     })
@@ -259,7 +259,7 @@ test('test createPipeCore case', async () => {
         core: nick.pipe
       };
     })
-    .pipe<typeof _value['nick']>((nick, _, update) => {
+    .pipe((nick, _, update) => {
       expect(nick).toEqual({
         pipe: 2,
         core: 1
