@@ -68,4 +68,12 @@ export type OtherPipeCoreConfig<Value, Config extends CustomStartConfig<Value>> 
 
 export type PiecePipeCore<Value, Config extends CustomStartConfig<Value>> = OtherPipeCoreConfig<Value, Config>;
 
-export type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreConfig<Value, Config>;
+export type PipeCoreInstance<Value, Config extends CustomStartConfig<Value>> = {
+  /**
+   * create one new pipeline to call
+   * @param {Boolean} [createOneFreshValue] - means need create one independent PipeCore, default is false
+   */
+  instance(createOneFreshValue?: boolean): PipeCoreConfig<Value, Config>;
+};
+
+export type PipeCore<Value, Config extends CustomStartConfig<Value>> = PipeCoreInstance<Value, Config> & PipeCoreConfig<Value, Config>;

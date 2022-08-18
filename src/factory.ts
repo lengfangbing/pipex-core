@@ -31,7 +31,7 @@ export class PipeValueFactory<Value extends Record<string, any>> {
     this.actionList = [];
   }
 
-  private findActionValueForEachList (
+  findActionValueForEachList (
     actionValue: Action['value'],
     list: Array<Action>
   ): Action | void {
@@ -55,9 +55,6 @@ export class PipeValueFactory<Value extends Record<string, any>> {
       const newList = findActionValue.list || [];
       newList.push(action);
       findActionValue.list = newList;
-    } else {
-      // 如果没找到，就直接加到actionList最后
-      this.actionList.push(action);
     }
   }
 
