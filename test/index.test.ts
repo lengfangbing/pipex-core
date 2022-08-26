@@ -219,7 +219,7 @@ test('test instance process process', async () => {
         count++;
         return '123';
       })
-      .pipe<string>(name => {
+      .pipe(name => {
         expect(count).toBe(5);
         count++;
         expect(name).toBe('123');
@@ -245,7 +245,7 @@ test('test instance process process', async () => {
         count++;
         return '123';
       })
-      .pipe<string>(name => {
+      .pipe(name => {
         expect(count).toBe(8);
         count++;
         expect(name).toBe('123');
@@ -268,7 +268,7 @@ test('test instance process process', async () => {
       expect(name).toBe('pipe-core');
       return name;
     })
-    .pipe<string>((name, piecePipe, set) => {
+    .pipe((name, piecePipe, set) => {
       expect(count).toBe(1);
       count++;
       set({ name: 'new pipe-core' });
@@ -289,7 +289,7 @@ test('test instance process process', async () => {
           expect(name).toBe('new pipe-core');
           return name;
         })
-        .pipe<string>((name, piecePipe) => {
+        .pipe((name, piecePipe) => {
           expect(count).toBe(13);
           count++;
           piecePipe
@@ -298,7 +298,7 @@ test('test instance process process', async () => {
               count++;
               return _name;
             })
-            .pipe<string>((_name, _, set) => {
+            .pipe((_name, _, set) => {
               expect(count).toBe(15);
               count++;
               set({ name: 'pipe-core' });
@@ -430,7 +430,7 @@ test('test use piecePipe and set', async () => {
         });
       return '123';
     })
-    .pipe<string>((name, piecePipe) => {
+    .pipe((name, piecePipe) => {
       // name === '123'
       expect(name).toBe('123');
       piecePipe
